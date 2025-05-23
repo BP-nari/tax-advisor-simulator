@@ -12,6 +12,12 @@
 <body>
   <h1>税理士顧問料シミュレーター</h1>
 
+  <label for="entityType">事業形態</label>
+  <select id="entityType">
+    <option value="corporate">法人</option>
+    <option value="individual">個人</option>
+  </select>
+
   <label for="revenue">売上規模</label>
   <select id="revenue">
     <option value="10000">1000万未満</option>
@@ -59,7 +65,9 @@
 
   <button onclick="calculateFee()">料金を計算する</button>
 
-  <div class="result" id="result"></div>
+  <div class="result" id="monthlyFee"></div>
+  <div class="result" id="settlementFee"></div>
+  <div class="result" id="totalAnnualFee"></div>
 
   <script>
     function getQueryParams() {
@@ -75,7 +83,7 @@
 
     function applyQueryParams() {
       const params = getQueryParams();
-      const keys = ['revenue', 'bookkeeping', 'visit', 'industry', 'employees'];
+      const keys = ['entityType', 'revenue', 'bookkeeping', 'visit', 'industry', 'employees'];
       for (const key of keys) {
         if (params[key]) {
           const el = document.getElementById(key);
@@ -86,17 +94,29 @@
     }
 
     function calculateFee() {
-      const revenue = parseInt(document.getElementById('revenue').value);
+      const entityType = document.getElementById('entityType').value;
+      let revenue = parseInt(document.getElementById('revenue').value);
       const bookkeeping = parseInt(document.getElementById('bookkeeping').value);
       const visit = parseInt(document.getElementById('visit').value);
       const industry = parseInt(document.getElementById('industry').value);
       const employees = parseInt(document.getElementById('employees').value);
 
-      const total = revenue + bookkeeping + visit + industry + employees;
-      document.getElementById('result').innerText = `概算月額顧問料：¥${total.toLocaleString()}`;
+      let monthlyBase = revenue + bookkeeping + visit + industry + employees;
+
+      if (entityType === 'individual') {
+        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
+      }
+
+      const settlementFee = monthlyBase * 4;
+      const totalAnnual = monthlyBase * 12 + settlementFee;
+
+      document.getElementById('monthlyFee').innerText = `月額顧問料：¥${monthlyBase.toLocaleString()}`;
+      document.getElementById('settlementFee').innerText = `決算料（4ヶ月分）：¥${settlementFee.toLocaleString()}`;
+      document.getElementById('totalAnnualFee').innerText = `年間合計（顧問料＋決算）：¥${totalAnnual.toLocaleString()}`;
     }
 
     window.onload = applyQueryParams;
   </script>
 </body>
 </html>
+
