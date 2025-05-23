@@ -130,13 +130,22 @@
     <div class="result" id="srAdvisorResult"></div>
   </div>
 
+
   <!-- 社労士 スポット -->
   <div id="sr-spot" class="tab-content">
-    <label><input type="checkbox" value="50000" class="sr-spot-option"> 就業規則作成</label>
-    <label><input type="checkbox" value="20000" class="sr-spot-option"> 36協定作成</label>
-    <label><input type="checkbox" value="30000" class="sr-spot-option"> 労基署対応</label>
-    <label><input type="checkbox" value="40000" class="sr-spot-option"> 助成金申請支援</label>
-    <label><input type="checkbox" value="50000" class="sr-spot-option"> 解雇・懲戒トラブル対応</label>
+    <label for="srSpotSelect">業務内容を選択してください（複数可）</label>
+    <select id="srSpotSelect" multiple size="10">
+      <option value="50000">就業規則作成（50,000円）</option>
+      <option value="20000">36協定作成（20,000円）</option>
+      <option value="30000">労基署対応（30,000円）</option>
+      <option value="40000">助成金申請支援（40,000円）</option>
+      <option value="50000">解雇・懲戒トラブル対応（50,000円）</option>
+      <option value="25000">入退社手続き代行（25,000円）</option>
+      <option value="30000">社会保険新規適用（30,000円）</option>
+      <option value="20000">年末調整（20,000円）</option>
+      <option value="15000">マイナンバー対応支援（15,000円）</option>
+      <option value="10000">その他スポット相談（10,000円～）</option>
+    </select>
 
     <button onclick="calculateSrSpot()">料金を計算する</button>
     <div class="result" id="srSpotResult"></div>
