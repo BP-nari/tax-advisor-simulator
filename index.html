@@ -34,7 +34,16 @@
   <label for="bookkeeping">記帳代行</label>
   <select id="bookkeeping">
     <option value="0">なし</option>
-    <option value="10000">あり</option>
+    <option value="50">50枚</option>
+    <option value="100">100枚</option>
+    <option value="150">150枚</option>
+    <option value="200">200枚</option>
+    <option value="250">250枚</option>
+    <option value="300">300枚</option>
+    <option value="350">350枚</option>
+    <option value="400">400枚</option>
+    <option value="450">450枚</option>
+    <option value="500">500枚</option>
   </select>
 
   <label for="visit">訪問頻度</label>
@@ -51,7 +60,7 @@
     <option value="0">一般企業</option>
     <option value="5000">建設業</option>
     <option value="5000">病院</option>
-    <option value="-10000">コンビニ</option>
+    <option value="1">コンビニ</option>
     <option value="3000">飲食店</option>
   </select>
 
@@ -95,24 +104,29 @@
 
     function calculateFee() {
       const entityType = document.getElementById('entityType').value;
-      const revenue = parseInt(document.getElementById('revenue').value);
-      const bookkeeping = parseInt(document.getElementById('bookkeeping').value);
+      let revenue = parseInt(document.getElementById('revenue').value);
+      const bookkeepingEntries = parseInt(document.getElementById('bookkeeping').value);
+      const bookkeeping = bookkeepingEntries * 50;
       const visit = parseInt(document.getElementById('visit').value);
-      const industry = parseInt(document.getElementById('industry').value);
+      const industryValue = document.getElementById('industry').value;
       const industryLabel = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
       const employees = parseInt(document.getElementById('employees').value);
 
-      let monthlyBase = revenue + bookkeeping + visit + employees;
+      let monthlyBase = 0;
 
-      // コンビニ業種は特殊処理
       if (industryLabel === 'コンビニ') {
-        monthlyBase = Math.max(monthlyBase - 10000, 15000); // 値引きしても最低¥15,000
+        if (revenue < 30000) {
+          monthlyBase = 15000 + bookkeeping + visit + employees;
+        } else {
+          monthlyBase = revenue + bookkeeping + visit + employees;
+        }
       } else {
-        monthlyBase += industry;
+        const industry = parseInt(industryValue);
+        monthlyBase = revenue + bookkeeping + visit + industry + employees;
       }
 
       if (entityType === 'individual') {
-        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000); // 個人は30%引き（最低1万円）
+        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
       }
 
       const settlementFee = monthlyBase * 4;
