@@ -22,6 +22,86 @@
     <button onclick="showTab('sr-spot')">社労士 スポット</button>
   </div>
 
+  <!-- 税理士 顧問料 -->
+  <div id="tax-advisor" class="tab-content">
+    <label for="entityType">事業形態</label>
+    <select id="entityType">
+      <option value="corporate">法人</option>
+      <option value="individual">個人</option>
+    </select>
+
+    <label for="revenue">売上規模</label>
+    <select id="revenue">
+      <option value="10000">1000万未満</option>
+      <option value="15000">1000万～3000万</option>
+      <option value="18000">3000万～5000万</option>
+      <option value="22000">5000万～8000万</option>
+      <option value="25000">8000万～1億</option>
+      <option value="30000">1億以上</option>
+      <option value="35000">1億から3億</option>
+      <option value="40000">3億～5億</option>
+      <option value="50000">5億以上</option>
+    </select>
+
+    <label for="bookkeeping">記帳代行</label>
+    <select id="bookkeeping">
+      <option value="0">なし</option>
+      <option value="50">50枚</option>
+      <option value="100">100枚</option>
+      <option value="150">150枚</option>
+      <option value="200">200枚</option>
+      <option value="250">250枚</option>
+      <option value="300">300枚</option>
+      <option value="350">350枚</option>
+      <option value="400">400枚</option>
+      <option value="450">450枚</option>
+      <option value="500">500枚</option>
+    </select>
+
+    <label for="visit">訪問頻度</label>
+    <select id="visit">
+      <option value="0">訪問なし</option>
+      <option value="1000">年1回</option>
+      <option value="2000">半年に1回</option>
+      <option value="3000">3ヶ月に1回</option>
+      <option value="5000">毎月</option>
+    </select>
+
+    <label for="industry">業種</label>
+    <select id="industry">
+      <option value="0">一般企業</option>
+      <option value="5000">建設業</option>
+      <option value="5000">病院</option>
+      <option value="1">コンビニ</option>
+      <option value="3000">飲食店</option>
+    </select>
+
+    <label for="employees">従業員数</label>
+    <select id="employees">
+      <option value="0">0人</option>
+      <option value="2000">1～4人</option>
+      <option value="4000">5～10人</option>
+      <option value="6000">11人以上</option>
+    </select>
+
+    <button onclick="calculateFee()">料金を計算する</button>
+    <div class="result" id="monthlyFee"></div>
+    <div class="result" id="settlementFee"></div>
+    <div class="result" id="totalAnnualFee"></div>
+  </div>
+
+  <!-- 税理士 スポット -->
+  <div id="tax-spot" class="tab-content">
+    <label><input type="checkbox" value="80000" class="tax-spot-option"> 決算申告</label>
+    <label><input type="checkbox" value="40000" class="tax-spot-option"> 修正申告</label>
+    <label><input type="checkbox" value="60000" class="tax-spot-option"> 税務調査対応</label>
+    <label><input type="checkbox" value="30000" class="tax-spot-option"> 消費税申告</label>
+    <label><input type="checkbox" value="50000" class="tax-spot-option"> 開業書類作成</label>
+
+    <button onclick="calculateTaxSpot()">料金を計算する</button>
+    <div class="result" id="taxSpotResult"></div>
+  </div>
+
   <!-- 社労士 顧問料 -->
   <div id="sr-advisor" class="tab-content">
     <label for="srEmployees">従業員数</label>
@@ -62,6 +142,49 @@
       document.getElementById(tabId).classList.add('active');
     }
 
+    function calculateFee() {
+      const entityType = document.getElementById('entityType').value;
+      const revenue = parseInt(document.getElementById('revenue').value);
+      const bookkeepingEntries = parseInt(document.getElementById('bookkeeping').value);
+      const bookkeeping = bookkeepingEntries * 50;
+      const visit = parseInt(document.getElementById('visit').value);
+      const industryValue = document.getElementById('industry').value;
+      const industryLabel = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
+      const employees = parseInt(document.getElementById('employees').value);
+
+      let monthlyBase = 0;
+
+      if (industryLabel === 'コンビニ') {
+        if (revenue < 30000) {
+          monthlyBase = 15000 + bookkeeping + visit + employees;
+        } else {
+          monthlyBase = revenue + bookkeeping + visit + employees;
+        }
+      } else {
+        const industry = parseInt(industryValue);
+        monthlyBase = revenue + bookkeeping + visit + industry + employees;
+      }
+
+      if (entityType === 'individual') {
+        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
+      }
+
+      const settlementFee = monthlyBase * 4;
+      const totalAnnual = monthlyBase * 12 + settlementFee;
+
+      document.getElementById('monthlyFee').innerText = `月額顧問料：¥${monthlyBase.toLocaleString()}`;
+      document.getElementById('settlementFee').innerText = `決算料（4ヶ月分）：¥${settlementFee.toLocaleString()}`;
+      document.getElementById('totalAnnualFee').innerText = `年間合計（顧問料＋決算）：¥${totalAnnual.toLocaleString()}`;
+    }
+
+    function calculateTaxSpot() {
+      let total = 0;
+      document.querySelectorAll('.tax-spot-option:checked').forEach(opt => {
+        total += parseInt(opt.value);
+      });
+      document.getElementById('taxSpotResult').innerText = `合計スポット料金：¥${total.toLocaleString()}`;
+    }
+
     function calculateSrAdvisor() {
       const base = parseInt(document.getElementById('srEmployees').value);
       const salary = parseInt(document.getElementById('srSalary').value);
@@ -76,7 +199,11 @@
       });
       document.getElementById('srSpotResult').innerText = `合計スポット料金：¥${total.toLocaleString()}`;
     }
+
+    // 初期表示タブ
+    showTab('tax-advisor');
   </script>
 </body>
 </html>
+
 
