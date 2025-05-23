@@ -51,7 +51,7 @@
     <option value="0">一般企業</option>
     <option value="5000">建設業</option>
     <option value="5000">病院</option>
-    <option value="3000">コンビニ</option>
+    <option value="-10000">コンビニ</option>
     <option value="3000">飲食店</option>
   </select>
 
@@ -95,16 +95,24 @@
 
     function calculateFee() {
       const entityType = document.getElementById('entityType').value;
-      let revenue = parseInt(document.getElementById('revenue').value);
+      const revenue = parseInt(document.getElementById('revenue').value);
       const bookkeeping = parseInt(document.getElementById('bookkeeping').value);
       const visit = parseInt(document.getElementById('visit').value);
       const industry = parseInt(document.getElementById('industry').value);
+      const industryLabel = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
       const employees = parseInt(document.getElementById('employees').value);
 
-      let monthlyBase = revenue + bookkeeping + visit + industry + employees;
+      let monthlyBase = revenue + bookkeeping + visit + employees;
+
+      // コンビニ業種は特殊処理
+      if (industryLabel === 'コンビニ') {
+        monthlyBase = Math.max(monthlyBase - 10000, 15000); // 値引きしても最低¥15,000
+      } else {
+        monthlyBase += industry;
+      }
 
       if (entityType === 'individual') {
-        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
+        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000); // 個人は30%引き（最低1万円）
       }
 
       const settlementFee = monthlyBase * 4;
@@ -119,4 +127,3 @@
   </script>
 </body>
 </html>
-
