@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>税理士顧問料シミュレーター</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label, select, input { display: block; margin: 10px 0; width: 100%; }
+    .result { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>税理士顧問料シミュレーター</h1>
+
+  <label for="revenue">売上規模</label>
+  <select id="revenue">
+    <option value="10000">1000万未満</option>
+    <option value="15000">1000万～3000万</option>
+    <option value="18000">3000万～5000万</option>
+    <option value="22000">5000万～8000万</option>
+    <option value="25000">8000万～1億</option>
+    <option value="30000">1億以上</option>
+    <option value="35000">1億から3億</option>
+    <option value="40000">3億～5億</option>
+    <option value="50000">5億以上</option>
+  </select>
+
+  <label for="bookkeeping">記帳代行</label>
+  <select id="bookkeeping">
+    <option value="0">なし</option>
+    <option value="10000">あり</option>
+  </select>
+
+  <label for="visit">訪問頻度</label>
+  <select id="visit">
+    <option value="0">訪問なし</option>
+    <option value="1000">年1回</option>
+    <option value="2000">半年に1回</option>
+    <option value="3000">3ヶ月に1回</option>
+    <option value="5000">毎月</option>
+  </select>
+
+  <label for="industry">業種</label>
+  <select id="industry">
+    <option value="0">一般企業</option>
+    <option value="5000">建設業</option>
+    <option value="5000">病院</option>
+    <option value="3000">コンビニ</option>
+    <option value="3000">飲食店</option>
+  </select>
+
+  <label for="employees">従業員数</label>
+  <select id="employees">
+    <option value="0">0人</option>
+    <option value="2000">1～4人</option>
+    <option value="4000">5～10人</option>
+    <option value="6000">11人以上</option>
+  </select>
+
+  <button onclick="calculateFee()">料金を計算する</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function getQueryParams() {
+      const params = {};
+      const queryString = window.location.search.substring(1);
+      const pairs = queryString.split("&");
+      for (const pair of pairs) {
+        const [key, value] = pair.split("=");
+        if (key) params[key] = decodeURIComponent(value);
+      }
+      return params;
+    }
+
+    function applyQueryParams() {
+      const params = getQueryParams();
+      const keys = ['revenue', 'bookkeeping', 'visit', 'industry', 'employees'];
+      for (const key of keys) {
+        if (params[key]) {
+          const el = document.getElementById(key);
+          if (el) el.value = params[key];
+        }
+      }
+      calculateFee();
+    }
+
+    function calculateFee() {
+      const revenue = parseInt(document.getElementById('revenue').value);
+      const bookkeeping = parseInt(document.getElementById('bookkeeping').value);
+      const visit = parseInt(document.getElementById('visit').value);
+      const industry = parseInt(document.getElementById('industry').value);
+      const employees = parseInt(document.getElementById('employees').value);
+
+      const total = revenue + bookkeeping + visit + industry + employees;
+      document.getElementById('result').innerText = `概算月額顧問料：¥${total.toLocaleString()}`;
+    }
+
+    window.onload = applyQueryParams;
+  </script>
+</body>
+</html>
