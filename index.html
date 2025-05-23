@@ -92,11 +92,19 @@
 
   <!-- 税理士 スポット -->
   <div id="tax-spot" class="tab-content">
-    <label><input type="checkbox" value="80000" class="tax-spot-option"> 決算申告</label>
-    <label><input type="checkbox" value="40000" class="tax-spot-option"> 修正申告</label>
-    <label><input type="checkbox" value="60000" class="tax-spot-option"> 税務調査対応</label>
-    <label><input type="checkbox" value="30000" class="tax-spot-option"> 消費税申告</label>
-    <label><input type="checkbox" value="50000" class="tax-spot-option"> 開業書類作成</label>
+    <label for="taxSpotSelect">業務内容を選択してください（複数可）</label>
+    <select id="taxSpotSelect" multiple size="10">
+      <option value="80000">決算申告（80,000円）</option>
+      <option value="40000">修正申告（40,000円）</option>
+      <option value="60000">税務調査対応（60,000円）</option>
+      <option value="30000">消費税申告（30,000円）</option>
+      <option value="50000">開業書類作成（50,000円）</option>
+      <option value="45000">青色申告承認申請（45,000円）</option>
+      <option value="35000">償却資産申告（35,000円）</option>
+      <option value="25000">法定調書作成（25,000円）</option>
+      <option value="30000">記帳指導（30,000円）</option>
+      <option value="40000">年末調整（40,000円）</option>
+    </select>
 
     <button onclick="calculateTaxSpot()">料金を計算する</button>
     <div class="result" id="taxSpotResult"></div>
@@ -135,53 +143,52 @@
   </div>
 
   <script>
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      document.getElementById(tabId).classList.add('active');
-    }
-
     function calculateFee() {
-      const entityType = document.getElementById('entityType').value;
-      const revenue = parseInt(document.getElementById('revenue').value);
-      const bookkeepingEntries = parseInt(document.getElementById('bookkeeping').value);
-      const bookkeeping = bookkeepingEntries * 50;
-      const visit = parseInt(document.getElementById('visit').value);
-      const industryValue = document.getElementById('industry').value;
-      const industryLabel = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
-      const employees = parseInt(document.getElementById('employees').value);
+  const entityType = document.getElementById('entityType').value;
+  const revenue = parseInt(document.getElementById('revenue').value);
+  const bookkeepingEntries = parseInt(document.getElementById('bookkeeping').value);
+  const bookkeeping = bookkeepingEntries * 50;
+  const visit = parseInt(document.getElementById('visit').value);
+  const industryValue = document.getElementById('industry').value;
+  const industryLabel = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
+  const employees = parseInt(document.getElementById('employees').value);
 
-      let monthlyBase = 0;
+  let monthlyBase = 0;
 
-      if (industryLabel === 'コンビニ') {
-        if (revenue < 30000) {
-          monthlyBase = 15000 + bookkeeping + visit + employees;
-        } else {
-          monthlyBase = revenue + bookkeeping + visit + employees;
-        }
-      } else {
-        const industry = parseInt(industryValue);
-        monthlyBase = revenue + bookkeeping + visit + industry + employees;
-      }
+  if (industryLabel === 'コンビニ') {
+    if (revenue < 30000) {
+      monthlyBase = 15000 + bookkeeping + visit + employees;
+    } else {
+      monthlyBase = revenue + bookkeeping + visit + employees;
+    }
+  } else {
+    const industry = parseInt(industryValue);
+    monthlyBase = revenue + bookkeeping + visit + industry + employees;
+  }
 
-      if (entityType === 'individual') {
-        monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
-      }
+  if (entityType === 'individual') {
+    monthlyBase = Math.max(Math.floor(monthlyBase * 0.7), 10000);
+  }
 
-      const settlementFee = monthlyBase * 4;
-      const totalAnnual = monthlyBase * 12 + settlementFee;
+  const settlementFee = monthlyBase * 4;
+  const totalAnnual = monthlyBase * 12 + settlementFee;
 
-      document.getElementById('monthlyFee').innerText = `月額顧問料：¥${monthlyBase.toLocaleString()}`;
-      document.getElementById('settlementFee').innerText = `決算料（4ヶ月分）：¥${settlementFee.toLocaleString()}`;
-      document.getElementById('totalAnnualFee').innerText = `年間合計（顧問料＋決算）：¥${totalAnnual.toLocaleString()}`;
+  document.getElementById('monthlyFee').innerText = `月額顧問料：¥${monthlyBase.toLocaleString()}`;
+  document.getElementById('settlementFee').innerText = `決算料（4ヶ月分）：¥${settlementFee.toLocaleString()}`;
+  document.getElementById('totalAnnualFee').innerText = `年間合計（顧問料＋決算）：¥${totalAnnual.toLocaleString()}`;
+}
+
+function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
     }
 
     function calculateTaxSpot() {
       let total = 0;
-      document.querySelectorAll('.tax-spot-option:checked').forEach(opt => {
-        total += parseInt(opt.value);
-      });
+      const options = document.getElementById('taxSpotSelect').selectedOptions;
+      for (let i = 0; i < options.length; i++) {
+        total += parseInt(options[i].value);
+      }
       document.getElementById('taxSpotResult').innerText = `合計スポット料金：¥${total.toLocaleString()}`;
     }
 
@@ -200,10 +207,10 @@
       document.getElementById('srSpotResult').innerText = `合計スポット料金：¥${total.toLocaleString()}`;
     }
 
-    // 初期表示タブ
     showTab('tax-advisor');
   </script>
 </body>
 </html>
+
 
 
