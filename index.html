@@ -143,23 +143,7 @@
   </div>
 
 <!-- 税理士 スポット -->
-<div id="tax-spot" class="tab-content">
-  <label for="taxSpotEntity">事業形態</label>
-  <select id="taxSpotEntity">
-    <option value="corporate">法人</option>
-    <option value="individual">個人</option>
-  </select>
-
-  <label for="taxSpotRevenue">年商</label>
-  <select id="taxSpotRevenue">
-    <option value="0">1000万未満</option>
-    <option value="30000">1000万〜3000万</option>
-    <option value="50000">3000万〜5000万</option>
-    <option value="100000">5000万〜1億</option>
-    <option value="200000">1億以上</option>
-  </select>
-
-  <label for="taxSpotSelect">業務内容を選択してください（複数可）</label>
+ <label for="taxSpotSelect">業務内容を選択してください（複数可）</label>
   <select id="taxSpotSelect" multiple size="10">
     <option value="80000" data-type="申告">決算申告（80,000円）</option>
     <option value="40000" data-type="申告">修正申告（40,000円）</option>
@@ -175,39 +159,43 @@
 
   <button onclick="calculateTaxSpot()">料金を計算する</button>
   <div class="result" id="taxSpotResult"></div>
-</div>
 
-<script>
-  function calculateTaxSpot() {
-    const entity = document.getElementById('taxSpotEntity').value;
-    const revenue = parseInt(document.getElementById('taxSpotRevenue').value, 10);
-    const select = document.getElementById('taxSpotSelect');
-    let sum = 0;
+  <script>
+    function calculateTaxSpot() {
+      const entity = document.getElementById('taxSpotEntity').value;
+      const revenue = parseInt(document.getElementById('taxSpotRevenue').value, 10);
+      const select = document.getElementById('taxSpotSelect');
+      let sum = 0;
+      let申告加算合計 = 0;
 
-    for (let opt of select.selectedOptions) {
-      const base = parseInt(opt.value, 10);
-      const type = opt.getAttribute("data-type");
+      for (let opt of select.selectedOptions) {
+        const base = parseInt(opt.value, 10);
+        const type = opt.getAttribute("data-type");
 
-      // 「申告」業務のみ加算対象
-      if (type === "申告") {
-        let multiplier = 1;
-        if (revenue >= 10000) multiplier = 1.2;
-        else if (revenue >= 5000) multiplier = 1.1;
-        sum += Math.floor(base * multiplier);
-      } else {
-        sum += base; // 通常料金
+        if (type === "申告") {
+          let multiplier = 1;
+          if (revenue === 4) multiplier = 1.1;
+          else if (revenue === 5) multiplier = 1.2;
+          const adjusted = Math.floor(base * multiplier);
+          sum += adjusted;
+          申告加算合計 += adjusted;
+        } else {
+          sum += base;
+        }
       }
-    }
 
-    // 個人事業主は申告料金から割引
-    if (entity === "individual") {
-      sum = Math.max(sum - 5000, 0);
-    }
+      // 個人事業主は申告業務から¥5,000引き（ただし最低0円）
+      if (entity === "individual") {
+        sum = Math.max(sum - 5000, 0);
+      }
 
-    document.getElementById('taxSpotResult').innerText =
-      `合計スポット料金：¥${sum.toLocaleString()}`;
-  }
-</script>
+      document.getElementById('taxSpotResult').innerText =
+        `合計スポット料金：¥${sum.toLocaleString()}`;
+    }
+  </script>
+
+</body>
+</html>
 
 
   <!-- 社労士 顧問料 -->
