@@ -209,7 +209,7 @@
       const label      = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
       const employees  = parseInt(document.getElementById('employees').value, 10);
       let base;
-      if(label.includes('コンビニ')){
+      if(label.includes('FC系コンビニ')){
         base = revenue <30000?15000:revenue;
       } else {
         base = revenue;
