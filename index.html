@@ -157,6 +157,15 @@
       <option value="30000">記帳指導（30,000円）</option>
       <option value="40000">年末調整（40,000円）</option>
     </select>
+<label for="revenueLevel">年商を選択してください</label>
+<select id="revenueLevel">
+  <option value="0">1,000万円未満</option>
+  <option value="3000">1,000万〜3,000万円</option>
+  <option value="5000">3,000万〜5,000万円</option>
+  <option value="10000">5,000万〜1億円</option>
+  <option value="10001">1億円以上</option>
+</select>
+    
     <button onclick="calculateTaxSpot()">料金を計算する</button>
     <div class="result" id="taxSpotResult"></div>
   </div>
@@ -197,14 +206,6 @@
       <option value="10000">その他スポット相談（10,000円～）</option>
     </select>
 
-<label for="revenueLevel">年商を選択してください</label>
-<select id="revenueLevel">
-  <option value="0">1,000万円未満</option>
-  <option value="3000">1,000万〜3,000万円</option>
-  <option value="5000">3,000万〜5,000万円</option>
-  <option value="10000">5,000万〜1億円</option>
-  <option value="10001">1億円以上</option>
-</select>
 
     
     <button onclick="calculateSrSpot()">料金を計算する</button>
