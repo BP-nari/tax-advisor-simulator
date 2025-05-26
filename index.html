@@ -142,22 +142,72 @@
     <div class="result" id="totalAnnualFee"></div>
   </div>
 
-  <!-- 税理士 スポット -->
- 
-  <label for="taxSpotSelect">業務内容を選択してください（複数可）</label>
-  <select id="taxSpotSelect" multiple size="10">
-    <option value="80000">決算申告（80,000円）</option>
-    <option value="40000">修正申告（40,000円）</option>
-    <option value="60000">税務調査対応（60,000円）</option>
-    <option value="30000">消費税申告（30,000円）</option>
-    <option value="50000">開業書類作成（50,000円）</option>
-    <option value="45000">青色申告承認申請（45,000円）</option>
-    <option value="35000">償却資産申告（35,000円）</option>
-    <option value="25000">法定調書作成（25,000円）</option>
-    <option value="30000">記帳指導（30,000円）</option>
-    <option value="40000">年末調整（40,000円）</option>
+<!-- 税理士 スポット -->
+<div id="tax-spot" class="tab-content">
+  <label for="taxSpotEntity">事業形態</label>
+  <select id="taxSpotEntity">
+    <option value="corporate">法人</option>
+    <option value="individual">個人</option>
   </select>
 
+  <label for="taxSpotRevenue">年商</label>
+  <select id="taxSpotRevenue">
+    <option value="0">1000万未満</option>
+    <option value="30000">1000万〜3000万</option>
+    <option value="50000">3000万〜5000万</option>
+    <option value="100000">5000万〜1億</option>
+    <option value="200000">1億以上</option>
+  </select>
+
+  <label for="taxSpotSelect">業務内容を選択してください（複数可）</label>
+  <select id="taxSpotSelect" multiple size="10">
+    <option value="80000" data-type="申告">決算申告（80,000円）</option>
+    <option value="40000" data-type="申告">修正申告（40,000円）</option>
+    <option value="60000" data-type="調査">税務調査対応（60,000円）</option>
+    <option value="30000" data-type="申告">消費税申告（30,000円）</option>
+    <option value="50000" data-type="その他">開業書類作成（50,000円）</option>
+    <option value="45000" data-type="その他">青色申告承認申請（45,000円）</option>
+    <option value="35000" data-type="その他">償却資産申告（35,000円）</option>
+    <option value="25000" data-type="その他">法定調書作成（25,000円）</option>
+    <option value="30000" data-type="その他">記帳指導（30,000円）</option>
+    <option value="40000" data-type="その他">年末調整（40,000円）</option>
+  </select>
+
+  <button onclick="calculateTaxSpot()">料金を計算する</button>
+  <div class="result" id="taxSpotResult"></div>
+</div>
+
+<script>
+  function calculateTaxSpot() {
+    const entity = document.getElementById('taxSpotEntity').value;
+    const revenue = parseInt(document.getElementById('taxSpotRevenue').value, 10);
+    const select = document.getElementById('taxSpotSelect');
+    let sum = 0;
+
+    for (let opt of select.selectedOptions) {
+      const base = parseInt(opt.value, 10);
+      const type = opt.getAttribute("data-type");
+
+      // 「申告」業務のみ加算対象
+      if (type === "申告") {
+        let multiplier = 1;
+        if (revenue >= 10000) multiplier = 1.2;
+        else if (revenue >= 5000) multiplier = 1.1;
+        sum += Math.floor(base * multiplier);
+      } else {
+        sum += base; // 通常料金
+      }
+    }
+
+    // 個人事業主は申告料金から割引
+    if (entity === "individual") {
+      sum = Math.max(sum - 5000, 0);
+    }
+
+    document.getElementById('taxSpotResult').innerText =
+      `合計スポット料金：¥${sum.toLocaleString()}`;
+  }
+</script>
 
 
   <!-- 社労士 顧問料 -->
