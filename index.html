@@ -2,149 +2,384 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>料金シミュレーター</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-    .tab-buttons button { margin: 5px; padding: 10px; cursor: pointer; }
-    .tab-content { display: none; margin-top: 20px; }
-    .tab-content.active { display: block; }
-    label, select, input, button { display: block; margin: 10px 0; width: 100%; max-width: 400px; }
-    .result { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+    :root {
+      --primary-color: #4a6da7;
+      --accent-color: #e83e8c;
+      --light-bg: #f8f9fa;
+      --dark-bg: #343a40;
+      --text-color: #333;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #f5f7fa;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .header h1 {
+      margin: 0;
+      color: var(--primary-color);
+      font-size: 2.2rem;
+    }
+    
+    .mascot-image {
+      width: 120px;
+      height: auto;
+      margin-left: 20px;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .tab-buttons button {
+      padding: 12px 20px;
+      background-color: var(--light-bg);
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 150px;
+      color: var(--primary-color);
+    }
+    
+    .tab-buttons button:hover {
+      background-color: #e9ecef;
+      border-color: var(--primary-color);
+    }
+    
+    .tab-buttons button.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+    
+    .tab-content {
+      display: none;
+      background-color: white;
+      padding: 25px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-top: 20px;
+      position: relative;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark-bg);
+    }
+    
+    select, input {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      margin-bottom: 15px;
+      background-color: white;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(74, 109, 167, 0.2);
+    }
+    
+    select[multiple] {
+      height: auto;
+      min-height: 200px;
+    }
+    
+    button.calculate {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: inline-block;
+      width: auto;
+      margin-top: 10px;
+    }
+    
+    button.calculate:hover {
+      background-color: #3a5a8f;
+    }
+    
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #e9f7ef;
+      border-left: 5px solid #2ecc71;
+      border-radius: 4px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    
+    .tab-description {
+      color: #666;
+      margin-bottom: 20px;
+      font-style: italic;
+      font-size: 1.1em;
+    }
+    
+    .price-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .price-table th, .price-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .price-table th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+    }
+    
+    .price-table tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    
+    .price-table tr:hover {
+      background-color: #e9ecef;
+    }
+    
+    .price-column {
+      text-align: right;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .mascot-image {
+        margin: 15px 0 0 0;
+      }
+      
+      .tab-buttons button {
+        flex: 0 0 calc(50% - 5px);
+        min-width: 0;
+      }
+      
+      .price-table th, .price-table td {
+        padding: 8px 10px;
+        font-size: 0.9em;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .tab-buttons button {
+        flex: 0 0 100%;
+      }
+      
+      .tab-content {
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>料金シミュレーター※試作※</h1>
+  <div class="header">
+    <h1>料金シミュレーター</h1>
+    <img src="mascot.png" alt="マスコットキャラクター" class="mascot-image" id="mascot">
+  </div>
+  
   <div class="tab-buttons">
-    <button onclick="showTab('tax-advisor')">税理士 顧問料</button>
-    <button onclick="showTab('tax-spot')">税理士 スポット料金表</button>
-    <button onclick="showTab('sr-advisor')">社労士 顧問料</button>
-    <button onclick="showTab('sr-spot')">社労士 スポット料金表</button>
+    <button onclick="showTab('tax-advisor')" id="tax-advisor-btn">税理士 顧問料</button>
+    <button onclick="showTab('tax-spot')" id="tax-spot-btn">税理士 スポット料金</button>
+    <button onclick="showTab('sr-advisor')" id="sr-advisor-btn">社労士 顧問料</button>
+    <button onclick="showTab('sr-spot')" id="sr-spot-btn">社労士 スポット料金</button>
   </div>
 
   <!-- 税理士 顧問料 -->
   <div id="tax-advisor" class="tab-content">
-    <label for="entityType">事業形態</label>
-    <select id="entityType">
-      <option value="corporate">法人</option>
-      <option value="individual">個人</option>
-    </select>
+    <div class="form-group">
+      <label for="entityType">事業形態</label>
+      <select id="entityType">
+        <option value="corporate">法人</option>
+        <option value="individual">個人</option>
+      </select>
+    </div>
 
-    <label for="revenue">売上規模</label>
-    <select id="revenue">
-      <option value="10000">1000万未満</option>
-      <option value="14000">1000万～3000万</option>
-      <option value="16000">3000万～5000万</option>
-      <option value="20000">5000万～8000万</option>
-      <option value="23000">8000万～1億</option>
-      <option value="28000">1億～3億</option>
-      <option value="30000">3億～5億</option>
-      <option value="35000">5億～10億</option>
-      <option value="40000">10億以上</option>
-    </select>
+    <div class="form-group">
+      <label for="revenue">売上規模</label>
+      <select id="revenue">
+        <option value="10000">1000万未満</option>
+        <option value="14000">1000万～3000万</option>
+        <option value="16000">3000万～5000万</option>
+        <option value="20000">5000万～8000万</option>
+        <option value="23000">8000万～1億</option>
+        <option value="28000">1億～3億</option>
+        <option value="30000">3億～5億</option>
+        <option value="35000">5億～10億</option>
+        <option value="40000">10億以上</option>
+      </select>
+    </div>
     
-    <label for="accounting">会計処理の方法</label>
-    <select id="accounting">
-      <option value="0">会計ソフト</option>
-      <option value="0">Excel等の電子入力</option>
-      <option value="100">領収書ファイリング</option>
-      <option value="300">領収書を封筒や袋でまとめている</option>
-    </select>
+    <div class="form-group">
+      <label for="accounting">会計処理の方法</label>
+      <select id="accounting">
+        <option value="0">会計ソフト</option>
+        <option value="0">Excel等の電子入力</option>
+        <option value="100">領収書ファイリング</option>
+        <option value="300">領収書を封筒や袋でまとめている</option>
+      </select>
+    </div>
 
-    
-    <label for="bookkeeping">記帳代行</label>
-    <select id="bookkeeping">
-      <option value="0">なし</option>
-      <option value="50">50枚</option>
-      <option value="100">100枚</option>
-      <option value="150">150枚</option>
-      <option value="200">200枚</option>
-      <option value="250">250枚</option>
-      <option value="300">300枚</option>
-      <option value="350">350枚</option>
-      <option value="400">400枚</option>
-      <option value="450">450枚</option>
-      <option value="500">500枚</option>
-    </select>
+    <div class="form-group">
+      <label for="bookkeeping">記帳代行</label>
+      <select id="bookkeeping">
+        <option value="0">なし</option>
+        <option value="50">50枚</option>
+        <option value="100">100枚</option>
+        <option value="150">150枚</option>
+        <option value="200">200枚</option>
+        <option value="250">250枚</option>
+        <option value="300">300枚</option>
+        <option value="350">350枚</option>
+        <option value="400">400枚</option>
+        <option value="450">450枚</option>
+        <option value="500">500枚</option>
+      </select>
+    </div>
 
-    <label for="visit">訪問頻度</label>
-    <select id="visit">
-      <option value="0">訪問なし</option>
-      <option value="1000">オンライン</option>      
-      <option value="1000">年1回</option>
-      <option value="2000">半年に1回</option>
-      <option value="3000">3ヶ月に1回</option>
-      <option value="5000">毎月</option>
-    </select>
+    <div class="form-group">
+      <label for="visit">訪問頻度</label>
+      <select id="visit">
+        <option value="0">訪問なし</option>
+        <option value="1000">オンライン</option>      
+        <option value="1000">年1回</option>
+        <option value="2000">半年に1回</option>
+        <option value="3000">3ヶ月に1回</option>
+        <option value="5000">毎月</option>
+      </select>
+    </div>
 
-<label for="industry">業種</label>
-<select id="industry">
-  <option value="0">一般企業（加算なし）</option>
-  <option value="1530">A　農業・畜産業・園芸・サービス業（農業関連作業）</option>
-  <option value="2040">A2　林業（素材生産業：木材加工・きのこ・漆・木炭・竹など）</option>
-  <option value="2380">B　漁業・養殖業</option>
-  <option value="2550">C　鉱業・採石業・砂利採取業（金属・石炭・窯業原料用：セラミック・ガラス）</option>
-  <option value="2550">D　建設業・建築業</option>
-  <option value="2380">E　製造業（食品・飲料・繊維・木材製品・紙・皮・部品など）</option>
-  <option value="2550">F　電気・ガス・熱供給・水道業（インフラ元）</option>
-  <option value="1700">G1　情報通信業・IT関連・放送業</option>
-  <option value="1955">G2　映像・音声・文字情報制作業（WEB-CM・SNS動画・イベント映像・新聞など）</option>
-  <option value="2550">H1　鉄道業・航空運輸業・水運業（海運業）</option>
-  <option value="2380">H2　道路旅客運送業（一般乗用旅客・一般貸切旅客：タクシー・観光バス・介護タクシーなど）</option>
-  <option value="2380">H3　道路貨物運送業（トラック事業・物流）</option>
-  <option value="1190">H4　倉庫業・冷蔵倉庫業</option>
-  <option value="1190">H5　運輸附帯サービス業（梱包業・運送代理店）</option>
-  <option value="2040">I1　卸売業（各種）</option>
-  <option value="1615">I2　各種商品小売業</option>
-  <option value="1615">I2-1　自転車小売業（中古車販売・自動車設備・新車販売）</option>
-  <option value="1615">I2-2　医薬品・化粧品小売業</option>
+    <div class="form-group">
+      <label for="industry">業種</label>
+      <select id="industry">
+        <option value="0">一般企業（加算なし）</option>
+        <option value="1530">A　農業・畜産業・園芸・サービス業（農業関連作業）</option>
+        <option value="2040">A2　林業（素材生産業：木材加工・きのこ・漆・木炭・竹など）</option>
+        <option value="2380">B　漁業・養殖業</option>
+        <option value="2550">C　鉱業・採石業・砂利採取業（金属・石炭・窯業原料用：セラミック・ガラス）</option>
+        <option value="2550">D　建設業・建築業</option>
+        <option value="2380">E　製造業（食品・飲料・繊維・木材製品・紙・皮・部品など）</option>
+        <option value="2550">F　電気・ガス・熱供給・水道業（インフラ元）</option>
+        <option value="1700">G1　情報通信業・IT関連・放送業</option>
+        <option value="1955">G2　映像・音声・文字情報制作業（WEB-CM・SNS動画・イベント映像・新聞など）</option>
+        <option value="2550">H1　鉄道業・航空運輸業・水運業（海運業）</option>
+        <option value="2380">H2　道路旅客運送業（一般乗用旅客・一般貸切旅客：タクシー・観光バス・介護タクシーなど）</option>
+        <option value="2380">H3　道路貨物運送業（トラック事業・物流）</option>
+        <option value="1190">H4　倉庫業・冷蔵倉庫業</option>
+        <option value="1190">H5　運輸附帯サービス業（梱包業・運送代理店）</option>
+        <option value="2040">I1　卸売業（各種）</option>
+        <option value="1615">I2　各種商品小売業</option>
+        <option value="1615">I2-1　自転車小売業（中古車販売・自動車設備・新車販売）</option>
+        <option value="1615">I2-2　医薬品・化粧品小売業</option>
+        <option value="0">I2-4　FC系コンビニ</option>
+        <option value="1700">I2-5　EC販売など（無店舗小売業・インターネット）</option>
+        <option value="2550">I2-6　百貨店・総合スーパー</option>
+        <option value="1700">J　金融業</option>
+        <option value="1615">J1　質屋</option>
+        <option value="2040">J2　保険業（保険媒介代理業・保険サービス業）</option>
+        <option value="2550">K1　不動産（販売・取引・建物売買業・土地売買業・代理業・仲介業）</option>
+        <option value="1615">K2　不動産賃貸業・管理業・貸間業・駐車場業</option>
+        <option value="1190">K3　物品賃貸業（リース業・自動車賃貸業・娯楽用品賃貸業）</option>
+        <option value="2550">L1　学術研究・専門・技術サービス業（士業）</option>
+        <option value="1955">L2　広告業</option>
+        <option value="2550">L3　獣医業</option>
+        <option value="2550">L4　土木建築サービス業（清掃・保守・維持管理・建築設計・測量業）</option>
+        <option value="1615">L5　デザイン業・著述・芸術家業・写真業</option>
+        <option value="2550">L6　経営コンサルタント業</option>
+        <option value="1700">M1　宿泊業（旅館・ホテル）</option>
+        <option value="1700">M2　飲食店</option>
+        <option value="2550">M3　0時以降営業飲食店（居酒屋・ビヤホール・バー・キャバレー・ナイトクラブ）</option>
+        <option value="1700">M4　持ち帰り・業配達飲食サービス業（宅配ピザ・給食施設・配食サービス）</option>
+        <option value="1190">N1　生活関連サービス業・娯楽業（洗濯業・フィットネスクラブ・パチンコホール・ハウスクリーニングなど）</option>
+        <option value="1190">N2　理容業・美容業</option>
+        <option value="2550">N3　冠婚葬祭業（葬儀業・結婚式場業）</option>
+        <option value="0">O1　教育・学習支援業（幼稚園・各種学校）</option>
+        <option value="1700">O3　学習塾・教養・技能教授業</option>
+        <option value="2550">P1　医療・福祉（医療業・病院・一般診療所・歯科診療所）</option>
+        <option value="2040">P2　療術業（カイロプラクティック・リラクゼーションサロン・整体院）</option>
+        <option value="2040">P2-2　助産所・歯科技工所</option>
+        <option value="1700">P3　児童福祉事業・保育所</option>
+        <option value="2550">P4　老人福祉・介護事業（特別養護老人ホーム・訪問介護・短期入所介護）</option>
+        <option value="2550">P5　障害者福祉事業（就労支援B型など）</option>
+        <option value="1700">R　一般廃棄物処理業・産業廃棄物処理業</option>
+        <option value="1700">S　自動車整備業</option>
+        <option value="1700">T　機械等修理業</option>
+        <option value="2550">U　職業紹介・労働者派遣業</option>
+        <option value="1190">V　建物サービス業・ビルメンテナンス業</option>
+      </select>
+    </div>
 
-  <option value="0">I2-4　FC系コンビニ</option>
-  <option value="1700">I2-5　EC販売など（無店舗小売業・インターネット）</option>
-  <option value="2550">I2-6　百貨店・総合スーパー</option>
-  <option value="1700">J　金融業</option>
-  <option value="1615">J1　質屋</option>
-  <option value="2040">J2　保険業（保険媒介代理業・保険サービス業）</option>
-  <option value="2550">K1　不動産（販売・取引・建物売買業・土地売買業・代理業・仲介業）</option>
-  <option value="1615">K2　不動産賃貸業・管理業・貸間業・駐車場業</option>
-  <option value="1190">K3　物品賃貸業（リース業・自動車賃貸業・娯楽用品賃貸業）</option>
-  <option value="2550">L1　学術研究・専門・技術サービス業（士業）</option>
-  <option value="1955">L2　広告業</option>
-  <option value="2550">L3　獣医業</option>
-  <option value="2550">L4　土木建築サービス業（清掃・保守・維持管理・建築設計・測量業）</option>
-  <option value="1615">L5　デザイン業・著述・芸術家業・写真業</option>
-  <option value="2550">L6　経営コンサルタント業</option>
-  <option value="1700">M1　宿泊業（旅館・ホテル）</option>
-  <option value="1700">M2　飲食店</option>
-  <option value="2550">M3　0時以降営業飲食店（居酒屋・ビヤホール・バー・キャバレー・ナイトクラブ）</option>
-  <option value="1700">M4　持ち帰り・業配達飲食サービス業（宅配ピザ・給食施設・配食サービス）</option>
-  <option value="1190">N1　生活関連サービス業・娯楽業（洗濯業・フィットネスクラブ・パチンコホール・ハウスクリーニングなど）</option>
-  <option value="1190">N2　理容業・美容業</option>
-  <option value="2550">N3　冠婚葬祭業（葬儀業・結婚式場業）</option>
-  <option value="0">O1　教育・学習支援業（幼稚園・各種学校）</option>
+    <div class="form-group">
+      <label for="employees">従業員数</label>
+      <select id="employees">
+        <option value="0">0人</option>
+        <option value="1000">1～4人</option>
+        <option value="3000">5～10人</option>
+        <option value="5000">11人以上</option>
+      </select>
+    </div>
 
-  <option value="1700">O3　学習塾・教養・技能教授業</option>
-  <option value="2550">P1　医療・福祉（医療業・病院・一般診療所・歯科診療所）</option>
-  <option value="2040">P2　療術業（カイロプラクティック・リラクゼーションサロン・整体院）</option>
-  <option value="2040">P2-2　助産所・歯科技工所</option>
-  <option value="1700">P3　児童福祉事業・保育所</option>
-  <option value="2550">P4　老人福祉・介護事業（特別養護老人ホーム・訪問介護・短期入所介護）</option>
-  <option value="2550">P5　障害者福祉事業（就労支援B型など）</option>
-  <option value="1700">R　一般廃棄物処理業・産業廃棄物処理業</option>
-  <option value="1700">S　自動車整備業</option>
-  <option value="1700">T　機械等修理業</option>
-  <option value="2550">U　職業紹介・労働者派遣業</option>
-  <option value="1190">V　建物サービス業・ビルメンテナンス業</option>
-
-</select>
-    <label for="employees">従業員数</label>
-    <select id="employees">
-      <option value="0">0人</option>
-      <option value="1000">1～4人</option>
-      <option value="3000">5～10人</option>
-      <option value="5000">11人以上</option>
-    </select>
-
-    <button onclick="calculateFee()">料金を計算する</button>
+    <button onclick="calculateFee()" class="calculate">料金を計算する</button>
     <div class="result" id="monthlyFee"></div>
     <div class="result" id="settlementFee"></div>
     <div class="result" id="totalAnnualFee"></div>
@@ -152,85 +387,248 @@
 
   <!-- 税理士 スポット -->
   <div id="tax-spot" class="tab-content">
-    <label for="taxSpotSelect">↓シュミレーションではなく料金表です↓</label>
-    <select id="taxSpotSelect" multiple size="10">
-      <option value="80000">決算申告（100,000円～）</option>
-      <option value="40000">修正申告（60,000円～）</option>
-      <option value="60000">税務調査対応（80,000円～）</option>
-      <option value="30000">消費税申告（30,000円～）</option>
-      <option value="50000">開業書類作成（50,000円～）</option>
-      <option value="45000">青色申告承認申請（45,000円～）</option>
-      <option value="35000">償却資産申告（35,000円～）</option>
-      <option value="25000">法定調書作成（25,000円～）</option>
-      <option value="30000">記帳指導（30,000円～）</option>
-      <option value="40000">年末調整（40,000円～）</option>
-      <option value="100000">相続税申告（遺産総額の約1%）</option>
-      <option value="40000">贈与税申告（40,000円～）</option>
-      <option value="30000">補助金申請サポート（着手金30,000円～100,000円 + 成功報酬10%～30%）</option>
-      <option value="10000">税務相談（1時間10,000円前後）</option>
-      <option value="100000">経営コンサルティング（100,000円～）</option> 
-      <option value="50000">法人成り・会社設立サポート（50,000円～）</option>
-     <option value="30000">融資申請サポート（30,000円～）</option>
-     <option value="20000">税務署への申告手続き代行（20,000円～）</option>
-     <option value="80000">税務調査対応（80,000円～）</option>
-     <option value="10000">確定申告書類のチェック（10,000円～）</option>
-      
-    </select>
-    <button onclick="calculateTaxSpot()">料金を計算する</button>
-    <div class="result" id="taxSpotResult"></div>
+    <div class="tab-description">税理士スポット料金表</div>
+    
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>サービス内容</th>
+          <th>料金</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>決算申告</td>
+          <td class="price-column">100,000円～</td>
+        </tr>
+        <tr>
+          <td>修正申告</td>
+          <td class="price-column">60,000円～</td>
+        </tr>
+        <tr>
+          <td>税務調査対応</td>
+          <td class="price-column">80,000円～</td>
+        </tr>
+        <tr>
+          <td>消費税申告</td>
+          <td class="price-column">30,000円～</td>
+        </tr>
+        <tr>
+          <td>開業書類作成</td>
+          <td class="price-column">50,000円～</td>
+        </tr>
+        <tr>
+          <td>青色申告承認申請</td>
+          <td class="price-column">45,000円～</td>
+        </tr>
+        <tr>
+          <td>償却資産申告</td>
+          <td class="price-column">35,000円～</td>
+        </tr>
+        <tr>
+          <td>法定調書作成</td>
+          <td class="price-column">25,000円～</td>
+        </tr>
+        <tr>
+          <td>記帳指導</td>
+          <td class="price-column">30,000円～</td>
+        </tr>
+        <tr>
+          <td>年末調整</td>
+          <td class="price-column">40,000円～</td>
+        </tr>
+        <tr>
+          <td>相続税申告</td>
+          <td class="price-column">遺産総額の約1%</td>
+        </tr>
+        <tr>
+          <td>贈与税申告</td>
+          <td class="price-column">40,000円～</td>
+        </tr>
+        <tr>
+          <td>補助金申請サポート</td>
+          <td class="price-column">着手金30,000円～100,000円<br>+ 成功報酬10%～30%</td>
+        </tr>
+        <tr>
+          <td>税務相談</td>
+          <td class="price-column">1時間10,000円前後</td>
+        </tr>
+        <tr>
+          <td>経営コンサルティング</td>
+          <td class="price-column">100,000円～</td>
+        </tr>
+        <tr>
+          <td>法人成り・会社設立サポート</td>
+          <td class="price-column">50,000円～</td>
+        </tr>
+        <tr>
+          <td>融資申請サポート</td>
+          <td class="price-column">30,000円～</td>
+        </tr>
+        <tr>
+          <td>税務署への申告手続き代行</td>
+          <td class="price-column">20,000円～</td>
+        </tr>
+        <tr>
+          <td>確定申告書類のチェック</td>
+          <td class="price-column">10,000円～</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- 社労士 顧問料 -->
   <div id="sr-advisor" class="tab-content">
-    <label for="srEmployees">従業員数</label>
-    <select id="srEmployees">
-      <option value="15000">1～4人</option>
-      <option value="20000">5～10人</option>
-      <option value="25000">11～30人</option>
-      <option value="30000">31人以上</option>
-    </select>
+    <div class="form-group">
+      <label for="srEmployees">従業員数</label>
+      <select id="srEmployees">
+        <option value="15000">1～4人</option>
+        <option value="20000">5～10人</option>
+        <option value="25000">11～30人</option>
+        <option value="30000">31人以上</option>
+      </select>
+    </div>
 
-    <label for="srSalary">給与計算</label>
-    <select id="srSalary">
-      <option value="0">なし</option>
-      <option value="5000">あり</option>
-    </select>
+    <div class="form-group">
+      <label for="srSalary">給与計算</label>
+      <select id="srSalary">
+        <option value="0">なし</option>
+        <option value="5000">あり</option>
+      </select>
+    </div>
 
-    <button onclick="calculateSrAdvisor()">料金を計算する</button>
+    <button onclick="calculateSrAdvisor()" class="calculate">料金を計算する</button>
     <div class="result" id="srAdvisorResult"></div>
   </div>
 
   <!-- 社労士 スポット -->
   <div id="sr-spot" class="tab-content">
-    <label for="srSpotSelect">↓シュミレーションではなく料金表です↓</label>
-    <select id="srSpotSelect" multiple size="10">
-      <option value="50000">就業規則作成（50,000円）</option>
-      <option value="20000">36協定作成（20,000円）</option>
-      <option value="30000">労基署対応（30,000円）</option>
-      <option value="40000">助成金申請支援（着手金：50,000円～ 成功報酬：受給額の10%～20%）</option>
-      <option value="50000">解雇・懲戒トラブル対応（50,000円）</option>
-      <option value="25000">入退社手続き代行（25,000円）</option>
-      <option value="30000">社会保険新規適用（30,000円）</option>
-      <option value="20000">年末調整（20,000円）</option>
-<option value="30000">フレックスタイム制に関する協定書作成（30,000円）</option>
-<option value="30000">一年単位の変形労働時間制協定書作成（30,000円）</option>
-<option value="30000">産業医・衛生管理者選任届作成（30,000円）</option>
-<option value="50000">ハラスメント相談窓口設置支援（50,000円～）</option>
-<option value="50000">是正報告書作成（50,000円～）</option>
-<option value="10000">労働条件通知書作成指導（10,000円～）</option>
-<option value="15000">労働者死傷病報告書作成（15,000円）</option>
-<option value="80000">第三者行為災害届作成（80,000円）</option>
-<option value="80000">健康保険組合への編入手続き（80,000円）</option>
-<option value="30000">出産手当金請求書作成（30,000円）</option>
-<option value="30000">傷病手当金請求書作成（30,000円）</option>
-<option value="30000">年金裁定請求支援（30,000円）</option>
-      <option value="10000">その他スポット相談（10,000円～）</option>
-    </select>
-    <button onclick="calculateSrSpot()">料金を計算する</button>
-    <div class="result" id="srSpotResult"></div>
+    <div class="tab-description">社労士スポット料金表</div>
+    
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>サービス内容</th>
+          <th>料金</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>就業規則作成</td>
+          <td class="price-column">50,000円</td>
+        </tr>
+        <tr>
+          <td>36協定作成</td>
+          <td class="price-column">20,000円</td>
+        </tr>
+        <tr>
+          <td>労基署対応</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>助成金申請支援</td>
+          <td class="price-column">着手金：50,000円～<br>成功報酬：受給額の10%～20%</td>
+        </tr>
+        <tr>
+          <td>解雇・懲戒トラブル対応</td>
+          <td class="price-column">50,000円</td>
+        </tr>
+        <tr>
+          <td>入退社手続き代行</td>
+          <td class="price-column">25,000円</td>
+        </tr>
+        <tr>
+          <td>社会保険新規適用</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>年末調整</td>
+          <td class="price-column">20,000円</td>
+        </tr>
+        <tr>
+          <td>フレックスタイム制に関する協定書作成</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>一年単位の変形労働時間制協定書作成</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>産業医・衛生管理者選任届作成</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>ハラスメント相談窓口設置支援</td>
+          <td class="price-column">50,000円～</td>
+        </tr>
+        <tr>
+          <td>是正報告書作成</td>
+          <td class="price-column">50,000円～</td>
+        </tr>
+        <tr>
+          <td>労働条件通知書作成指導</td>
+          <td class="price-column">10,000円～</td>
+        </tr>
+        <tr>
+          <td>労働者死傷病報告書作成</td>
+          <td class="price-column">15,000円</td>
+        </tr>
+        <tr>
+          <td>第三者行為災害届作成</td>
+          <td class="price-column">80,000円</td>
+        </tr>
+        <tr>
+          <td>健康保険組合への編入手続き</td>
+          <td class="price-column">80,000円</td>
+        </tr>
+        <tr>
+          <td>出産手当金請求書作成</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>傷病手当金請求書作成</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>年金裁定請求支援</td>
+          <td class="price-column">30,000円</td>
+        </tr>
+        <tr>
+          <td>その他スポット相談</td>
+          <td class="price-column">10,000円～</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <script>
+    // 画像ファイルを保存
+    const mascotImg = document.getElementById('mascot');
+    mascotImg.onload = function() {
+      console.log('マスコット画像が読み込まれました');
+    };
+    mascotImg.onerror = function() {
+      console.error('マスコット画像の読み込みに失敗しました');
+    };
+    
+    // タブ切り替え機能
+    function showTab(id) {
+      // すべてのタブコンテンツを非表示にする
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // すべてのタブボタンからアクティブクラスを削除
+      document.querySelectorAll('.tab-buttons button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // 選択されたタブを表示し、対応するボタンをアクティブにする
+      document.getElementById(id).classList.add('active');
+      document.getElementById(id + '-btn').classList.add('active');
+    }
+    
+    // 税理士顧問料計算
     function calculateFee() {
       const entityType = document.getElementById('entityType').value;
       const revenue    = parseInt(document.getElementById('revenue').value, 10);
@@ -240,34 +638,48 @@
       const industryVal= parseInt(document.getElementById('industry').value, 10);
       const label      = document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text;
       const employees  = parseInt(document.getElementById('employees').value, 10);
+      
       let base;
       if(label.includes('FC系コンビニ')){
-        base = revenue <30000?15000:revenue;
+        base = revenue < 30000 ? 15000 : revenue;
       } else {
         base = revenue;
       }
+      
       let monthly = base + bookkeeping + visit + industryVal + employees;
-      if(entityType==='individual') monthly = Math.max(Math.floor(monthly*0.7),10000);
+      if(entityType === 'individual') monthly = Math.max(Math.floor(monthly * 0.7), 10000);
+      
       document.getElementById('monthlyFee').innerText = `月額顧問料：¥${monthly.toLocaleString()}`;
-      const settlement = monthly*4;
-      document.getElementById('settlementFee').innerText= `決算料(4ヶ月)：¥${settlement.toLocaleString()}`;
-      document.getElementById('totalAnnualFee').innerText= `年間合計：¥${(monthly*12+settlement).toLocaleString()}`;
+      const settlement = monthly * 4;
+      document.getElementById('settlementFee').innerText = `決算料(4ヶ月)：¥${settlement.toLocaleString()}`;
+      document.getElementById('totalAnnualFee').innerText = `年間合計：¥${(monthly * 12 + settlement).toLocaleString()}`;
+      
+      // 結果表示時のアニメーション
+      document.querySelectorAll('.result').forEach(el => {
+        el.style.animation = 'none';
+        setTimeout(() => {
+          el.style.animation = 'fadeIn 0.5s';
+        }, 10);
+      });
     }
-    function calculateTaxSpot(){
-      let sum=0; for(let opt of document.getElementById('taxSpotSelect').selectedOptions) sum+=parseInt(opt.value,10);
-      document.getElementById('taxSpotResult').innerText=`合計スポット料金：¥${sum.toLocaleString()}`;
+    
+    // 社労士顧問料計算
+    function calculateSrAdvisor() {
+      const base = parseInt(document.getElementById('srEmployees').value, 10);
+      const sal = parseInt(document.getElementById('srSalary').value, 10);
+      document.getElementById('srAdvisorResult').innerText = `月額顧問料：¥${(base + sal).toLocaleString()}`;
+      
+      // 結果表示時のアニメーション
+      document.getElementById('srAdvisorResult').style.animation = 'none';
+      setTimeout(() => {
+        document.getElementById('srAdvisorResult').style.animation = 'fadeIn 0.5s';
+      }, 10);
     }
-    function calculateSrAdvisor(){
-      const base=parseInt(document.getElementById('srEmployees').value,10);
-      const sal =parseInt(document.getElementById('srSalary').value,10);
-      document.getElementById('srAdvisorResult').innerText=`月額顧問料：¥${(base+sal).toLocaleString()}`;
-    }
-    function calculateSrSpot(){
-      let sum=0; for(let opt of document.getElementById('srSpotSelect').selectedOptions) sum+=parseInt(opt.value,10);
-      document.getElementById('srSpotResult').innerText=`合計スポット料金：¥${sum.toLocaleString()}`;
-    }
-    function showTab(id){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');}
-    showTab('tax-advisor');
+    
+    // 初期表示タブ設定
+    window.onload = function() {
+      showTab('tax-advisor');
+    };
   </script>
 </body>
 </html>
