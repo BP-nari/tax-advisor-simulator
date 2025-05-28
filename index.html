@@ -478,36 +478,40 @@
   </div>
 
   <!-- 社労士 顧問料 -->
-<div id="sr-advisor" class="tab-content">
-  <div class="form-group">
-    <label for="srEmployees">従業員数</label>
-    <select id="srEmployees">
-      <option value="1-5">1～5名</option>
-      <option value="6-10">6～10名</option>
-      <option value="11-15">11～15名</option>
-      <option value="16-20">16～20名</option>
-      <option value="21-30">21～30名</option>
-      <option value="31-40">31～40名</option>
-      <option value="41-50">41～50名</option>
-      <option value="51-60">51～60名</option>
-      <option value="61-70">61～70名</option>
-      <option value="71-80">71～80名</option>
-      <option value="81-90">81～90名</option>
-    </select>
-  </div>
+<script>
+  const feeTable = {
+    "1-5":     { none: 10000, simple: 10000, full: 15000 },
+    "6-10":    { none: 15000, simple: 15000, full: 20000 },
+    "11-15":   { none: 20000, simple: 20000, full: 25000 },
+    "16-20":   { none: 25000, simple: 25000, full: 30000 },
+    "21-30":   { none: 30000, simple: 30000, full: 35000 },
+    "31-40":   { none: 35000, simple: 35000, full: 40000 },
+    "41-50":   { none: 40000, simple: 40000, full: 45000 },
+    "51-60":   { none: 45000, simple: 45000, full: 50000 },
+    "61-70":   { none: 50000, simple: 50000, full: 55000 },
+    "71-80":   { none: 55000, simple: 55000, full: 60000 },
+    "81-90":   { none: '要相談', simple: '要相談', full: '要相談' }
+  };
 
-  <div class="form-group">
-    <label for="srSalary">給与計算</label>
-    <select id="srSalary">
-      <option value="none">なし</option>
-      <option value="simple">集計なし　提出された勤務時間や勤怠をそのまま反映し、単純な計算処理のみ</option>
-      <option value="full">集計あり　タイムカード・出勤簿等の取りまとめや、欠勤・残業の計算を含む集計業務付き</option>
-    </select>
-  </div>
+  function calculateSrAdvisor() {
+    const emp = document.getElementById("srEmployees").value;
+    const salary = document.getElementById("srSalary").value;
+    
+    const result = feeTable[emp] && feeTable[emp][salary];
 
-  <button onclick="calculateSrAdvisor()">料金を計算する</button>
-  <div class="result" id="srAdvisorResult"></div>
-</div>
+    const resultText = (typeof result === "number") ?
+      `月額顧問料：¥${result.toLocaleString()}` :
+      `該当する従業員数または集計条件では <strong>要相談</strong> となります。`;
+
+    document.getElementById("srAdvisorResult").innerHTML = resultText;
+
+    // 結果アニメーション
+    document.getElementById("srAdvisorResult").style.animation = 'none';
+    setTimeout(() => {
+      document.getElementById("srAdvisorResult").style.animation = 'fadeIn 0.5s';
+    }, 10);
+  }
+</script>
 
 <script>
   const feeTable = {
