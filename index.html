@@ -704,18 +704,22 @@
       });
     }
     
-    // 社労士顧問料計算
+  // 社労士顧問料計算
     function calculateSrAdvisor() {
-      const base = parseInt(document.getElementById('srEmployees').value, 10);
-      const sal = parseInt(document.getElementById('srSalary').value, 10);
-      document.getElementById('srAdvisorResult').innerText = `月額顧問料：¥${(base + sal).toLocaleString()}`;
-      
-      // 結果表示時のアニメーション
-      document.getElementById('srAdvisorResult').style.animation = 'none';
-      setTimeout(() => {
-        document.getElementById('srAdvisorResult').style.animation = 'fadeIn 0.5s';
-      }, 10);
+      const emp = document.getElementById('srEmployees').value;
+      const sal = document.getElementById('srSalary').value;
+      const res = feeTable[emp] && feeTable[emp][sal];
+      const txt = (typeof res==='number')
+        ? `月額顧問料：¥${res.toLocaleString()}`
+        : `該当条件では <strong>要相談</strong> となります。`;
+      document.getElementById('srAdvisorResult').innerHTML = txt;
+      // アニメーション
+      const el = document.getElementById('srAdvisorResult');
+      el.style.animation='none'; setTimeout(()=>el.style.animation='fadeIn 0.5s',10);
     }
+  </script>
+</body>
+</html>
     
     // 初期表示タブ設定
     window.onload = function() {
